@@ -1,12 +1,14 @@
 'use client';
 import { localTemplates } from '../../constants';
 import React, { useState } from 'react';
+import SaveTemplate from './components/saveTemplate';
 
 const ComposeEmail = () => {
   const [clientEmail, setClientEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [selectedTemplate , setSelectedTemplate] = useState(null)
+  const [showModal, setShowModal] = useState(false);
 
 
   const handleSelectTemplate = (template) => {
@@ -19,12 +21,16 @@ const ComposeEmail = () => {
   }
   
   const handleSaveTemplate = () => {
-    localTemplates.push({
-      name:`template ${localTemplates.length + 1}` ,
-      subject: subject ,
-      body: body
-    })
+    setShowModal(true);
   }
+
+  const handleSaveTemplateData = (templateData) => {
+    // You can perform actions with templateData (e.g., save to database)
+    console.log('Template data:', templateData);
+    setShowModal(false);
+  };
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,7 +42,7 @@ const ComposeEmail = () => {
     }
 
     try{
-      const response = await fetch('http://localhost:3000/email/send-email', {
+      const response = await fetch('http://localhost:3001/email/send-email', {
         method:'POST',
         headers: {
           'content-type' : 'application/json',
@@ -57,7 +63,7 @@ const ComposeEmail = () => {
   };
 
   return (
-    <div className='w-[70%] h-[100%] m-auto bg-[#ececf1] rounded-sm shadow-md px-10 py-6 space-y-6'>
+    <div className='w-[70%] h-[600px] m-auto bg-[#ffffff] rounded-sm shadow-md px-10 py-6 space-y-6'>
       <h2 className='text-center text-2xl font-semibold text-slate-900'>Compose Email</h2>
       <form onSubmit={handleSubmit} className='space-y-10 relative'>
       <div>
@@ -68,7 +74,7 @@ const ComposeEmail = () => {
             onChange={(e) => setClientEmail(e.target.value)}
             required
             placeholder='To'
-            className='w-full py-4 px-2 rounded-sm  outline-blue-200 border-gray-500'
+            className='w-full py-4 px-2  rounded-md  outline-blue-200 border border-gray-200'
           />
         </div>
         <div>
@@ -79,7 +85,7 @@ const ComposeEmail = () => {
             onChange={(e) => setSubject(e.target.value)}
             required
             placeholder='Subject'
-            className='w-full py-4 px-2 rounded-sm  outline-blue-200 border-gray-500'
+            className='w-full py-4 px-2 rounded-md  outline-blue-200 border border-gray-200'
           />
         </div>
         <div>
@@ -89,7 +95,7 @@ const ComposeEmail = () => {
             onChange={(e) => setBody(e.target.value)}
             required
             placeholder='Description'
-            className='w-full h-52 py-4 px-2 rounded-sm  outline-blue-200 border-gray-500'
+            className='w-full h-52 py-4 px-2 rounded-md  outline-blue-200 border border-gray-200'
           />
         </div>
         <div>
@@ -106,8 +112,9 @@ const ComposeEmail = () => {
           </select>
         </div>
         <div>
-        <button className='bg-[#0bc9f2] hover:bg-[#01AFDF] p-4 rounded-md shadow-md text-slate-100 font-semibold right-40 absolute' type="button" onClick={() =>handleSaveTemplate()}>save template</button>
-        <button className='bg-[#0bc9f2] hover:bg-[#01AFDF] p-4 rounded-md shadow-md text-slate-100 font-semibold right-0 absolute' type="submit">Send Email</button>
+        <button className='bg-[#0bc9f2] hover:bg-[#01AFDF] p-3 rounded-md shadow-md text-slate-100 font-semibold text-sm right-40 bottom-1 absolute' type='button' onClick={handleSaveTemplate}>Save Template</button>   
+        <SaveTemplate isOpen={showModal} onClose={() => setShowModal(false)} onSave={handleSaveTemplateData} subject={subject} body={body} />     
+        <button className='bg-[#0bc9f2] hover:bg-[#01AFDF] p-3 rounded-md shadow-md text-slate-100 font-semibold text-sm right-0 bottom-1 absolute' type="submit">Send Email</button>
         </div>
       </form>
     </div>
